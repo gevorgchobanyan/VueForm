@@ -1,10 +1,22 @@
 <template>
   <div>
-    <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" :style="progressWidth">progress...</div>
-    <form v-on:submit.prevent>
+    
+    <div class="progress" style="width: 40%;">
+      <div class="progress-bar" 
+           role="progressbar" 
+           :style="progressWidth" 
+           aria-valuenow="25" 
+           aria-valuemin="0" 
+           aria-valuemax="100"
+           >
+           {{ done/controls.length*100 }} %
+           </div>
+    </div>
+
+    <form class="form-group" style="width: 40%;" v-on:submit.prevent>
       <div >
-        <label>Promo </label><br>
-        <input type="text" v-model="promo" ><br>
+        <label >Promo </label><small class="form-text text-muted">Hint: promo is newYear</small><br>
+        <input class="form-control form-control-sm" type="text" v-model="promo" ><br>
       </div>
       <div v-for="(item, index) in personInfo" :key="index">
         <div>
@@ -16,9 +28,10 @@
                 >
           </span>
           <br>
-          <input type="text"
-                  v-bind:value="item.value"
-                  @input="onInput(index, $event.target.value)"
+          <input class="form-control form-control-sm"
+                 type="text"
+                 v-bind:value="item.value"
+                 @input="onInput(index, $event.target.value)"
           >
           <br>
         </div>
@@ -26,9 +39,9 @@
       <label for="guest">Guests</label>&nbsp;
       <button class="add guest" @click="addGuest()">+</button><br>
 
-      <div v-for="(guest, index) in guests">
+      <div v-for="(guest, index) in guests" :key="guest.id">
         <label for="guest" @dblclick="removeGuest($event, index)"> Guest {{ index + 1 }} </label><br>
-        <input type="text"  name="guest" 
+        <input class="form-control form-control-sm" type="text"  name="guest" 
         v-model="guests[index]"
         @mouseenter="changeColor($event, index)"
         @mouseleave="$event.target.parentNode.style.color = 'black'"
@@ -38,28 +51,27 @@
       <input type="submit" value="Send Data" @click.once="toggleResult()" :disabled="done < controls.length">
     </form> 
 
+
+
     <br><br>
-    <!--  -->
     <div v-if="showResult">
-      <h2>All Done!</h2>
-      <div class="table1">
-        <table class="table1">
-          <tr v-for="item in personInfo" :key="item.name">  
-              <td>{{ item.name }}</td>
-              <td>{{ item.value }}</td>
-          </tr>
+      <h2>All Done! Your sale is {{ sale }} % </h2>
+      <table class="table table-striped">
+        <thead>
           <tr>
-            <td>Guests</td>
-            <td v-for="(guest, index) in guests" :key="index">
-                {{ guest }}
-            </td>
+            <th v-for="item in personInfo" 
+                :key="item.id" 
+                scope="col">{{ item.name }}</th>
           </tr>
-          
-        </table>
-        <!-- v-if удаляет элемент/компонент -->
-        <!-- v-show ставит style:display='none' на элемент/компонент -->
-        <p v-show="showResult"> Your sale was {{ sale }} % </p>
-      </div>
+        </thead>
+        <tbody>
+          <td v-for="item in personInfo" 
+                :key="item.id" 
+                scope="col">{{ item.value }}</td>
+        </tbody>
+      </table>
+      <h3>Guests:</h3> 
+      <p v-for="(guest, index) in guests" :key="index">{{ guest }}</p>
     </div>
 
 
@@ -78,12 +90,12 @@ export default {
       {
         name: 'email',
         value: '',
-        pattern: /.+/
+        pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
       },
       {
         name: 'firstname',
         value: '',
-        pattern: /^[a-zA-Z]+$/ //regular expression
+        pattern: /^[a-zA-Z]+$/ 
       },
       {
         name: 'lastname',
@@ -93,7 +105,7 @@ export default {
       {
         name: 'telephone',
         value: '',
-        pattern: /^[0-9]+$/
+        pattern: /^\d{10}$/
       },
     ],
   }),
@@ -106,6 +118,15 @@ export default {
     }
   },
   methods: {
+    changeColor(e, i){
+      if(i%2 === 0){
+        e.target.parentNode.style.color = "green"
+        e.target.style.color = "green"
+      }else{
+        e.target.parentNode.style.color = "blue" 
+        e.target.style.color = "blue" 
+      }
+    },
     toggleResult(){
       this.showResult = !this.showResult
     },
@@ -178,4 +199,5 @@ function getSale(code, callback){
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
 </style>
