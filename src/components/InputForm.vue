@@ -10,17 +10,17 @@
            aria-valuemax="100"
            >
            {{ done/controls.length*100 }} %
-           </div>
+      </div>
     </div>
 
-    <form class="form-group" style="width: 40%;" v-on:submit.prevent>
+    <form class="form-group" style="width: 25%;" v-on:submit.prevent>
       <div >
-        <label >Promo </label><small class="form-text text-muted">Hint: promo is newYear</small><br>
+        <label >Promo </label><small class="form-text text-muted">Promo code: newYear</small><br>
         <input class="form-control form-control-sm" type="text" v-model="promo" ><br>
       </div>
       <div v-for="(item, index) in personInfo" :key="index">
         <div>
-          <label>{{ item.name }}</label>
+          <label>{{ capitalize(item.name) }}</label>
           <span class="fa" 
                 v-if="controls[index].activated"
                 :class="controls[index].error ? 'fa-exclamation-circle text-danger' : 
@@ -39,8 +39,12 @@
       <label for="guest">Guests</label>&nbsp;
       <button class="add guest" @click="addGuest()">+</button><br>
 
-      <div v-for="(guest, index) in guests" :key="guest.id">
-        <label for="guest" @dblclick="removeGuest($event, index)"> Guest {{ index + 1 }} </label><br>
+      <div v-for="(guest, index) in guests" :key="'A' + index">
+        <label for="guest"> 
+          Guest {{ index + 1 }} 
+          <i style="color:red" class="fa fa-window-close"  @click="removeGuest($event, index)" aria-hidden="true"></i>
+        </label><br>
+        
         <input class="form-control form-control-sm" type="text"  name="guest" 
         v-model="guests[index]"
         @mouseenter="changeColor($event, index)"
@@ -57,21 +61,18 @@
     <div v-if="showResult">
       <h2>All Done! Your sale is {{ sale }} % </h2>
       <table class="table table-striped">
-        <thead>
-          <tr>
-            <th v-for="item in personInfo" 
-                :key="item.id" 
-                scope="col">{{ item.name }}</th>
-          </tr>
-        </thead>
         <tbody>
-          <td v-for="item in personInfo" 
-                :key="item.id" 
-                scope="col">{{ item.value }}</td>
+          <tr v-for="(item, index) in personInfo" :key="index"
+          >
+            <td>{{capitalize(item.name)}}</td>
+            <td>{{ item.value }}</td>
+          </tr>
+          <tr>
+            <td>Guests</td>
+            <td>{{guests.join()}}</td>
+          </tr>
         </tbody>
       </table>
-      <h3>Guests:</h3> 
-      <p v-for="(guest, index) in guests" :key="index">{{ guest }}</p>
     </div>
 
 
@@ -109,7 +110,7 @@ export default {
       },
     ],
   }),
-  beforeMount(){ //HOOK
+  beforeMount(){ 
     for(let i=0; i<this.personInfo.length;i++){
       this.controls.push({
         error: true,
@@ -134,7 +135,6 @@ export default {
       this.guests.push('')
     },
     removeGuest(e, index){
-      // console.log(e.target.parentNode)s
       this.guests.splice(index, 1)
     },
     onInput(index, value){
@@ -143,13 +143,13 @@ export default {
       data.value = value
       control.error = !data.pattern.test(value)
       control.activated = true
-    }
-    
+    },
+    capitalize(str){
+      return str.capitalize()
+    },
   },
-  computed: { // свойства которые высчитываются на основе других
-  // computed нельзя использовать при выполнении асинхронных операций т.к. computed высчитывается
-  // сразу как только зависимая переменная меняет значение (т.е. данные с сервера не успеют прийти)
-
+  computed: { 
+    
     done(){
       let done = 0
       for(let i=0; i<this.controls.length;i++){
@@ -165,10 +165,10 @@ export default {
       }
     }
   },
-  watch: { // один из примеров - использование с асинхронным кодом
+  watch: { 
     promo(){
       console.log('promo watcher triggered')
-      getSale(this.promo, (sale) => {  //стрелочная ф-ия сохраняет контекст Vue экземпляра
+      getSale(this.promo, (sale) => { 
         this.sale = sale
       })
     }
@@ -176,28 +176,32 @@ export default {
 
 }
 
+//
 
-
-// Можно объявлять ф-ии вне области видимости экземпляра Vue и вызывать их в рамках экземпляра
 function getSale(code, callback){
   let codes = {
     newYear: 10,
     some: 20
   }
-  // console.log(codes['newYear'])
-  // console.log(codes[code])
   let sale = (codes[code] !== undefined) ? codes[code] : 0
-  // console.log(sale)
   setTimeout(() => {
     callback(sale)
   }, 500)
 }
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+
+
+
 </script>
 
 
 
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+label i:hover {
+  background-color: rgb(228, 106, 106);
+}
 </style>

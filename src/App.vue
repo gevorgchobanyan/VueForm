@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <my-input></my-input>
+    <my-input-form></my-input-form>
   </div>
 </template>
 
 <script>
-import Input from '@/components/Input.vue'
+import InputForm from '@/components/InputForm.vue'
 
 export default {
   name: 'App',
   components: {
-    'my-input': Input,
+    'my-input-form': InputForm,
   },
   data: () => ({
 
